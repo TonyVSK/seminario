@@ -21,3 +21,8 @@ plt.title('Distribuição de Clientes: Churn vs Não Churn')
 plt.xlabel('Churn')
 plt.ylabel('Número de Clientes')
 plt.show()
+
+
+sns.boxplot(x='Churn', y='MonthlyCharges', data=df)
+plt.title('Custo Mensal x Churn')
+plt.show()
