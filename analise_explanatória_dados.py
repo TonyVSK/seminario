@@ -26,3 +26,15 @@ plt.show()
 sns.boxplot(x='Churn', y='MonthlyCharges', data=df)
 plt.title('Custo Mensal x Churn')
 plt.show()
+
+
+
+plt.figure(figsize=(7,5))
+sns.countplot(x='SeniorCitizen', hue='Churn', data=df, palette='pastel')
+plt.title('Distribuição de Churn e clientes idosos')
+plt.xlabel('É idoso? (0 = Não, 1 = Sim)')
+plt.ylabel('Número de Clientes')
+plt.legend(title='Churn', labels=['Não', 'Sim'])
+plt.tight_layout()
+plt.savefig('bar_senior_churn.png')
+plt.show()
