@@ -17,7 +17,7 @@ print(df.head())
 
 
 
-##################### ETAPA METODOLOGIA 3.1 : TRARAR PRE-PROCESSAMENTO #############################
+##################### ETAPA METODOLOGIA 3.1 : TRATAR PRE-PROCESSAMENTO #############################
 
 
 df = df.drop(['customerID'], axis=1) # com isso removemos as colunas irrelevantes, como customerID
@@ -31,4 +31,84 @@ for column in df.select_dtypes(include=['object']).columns:
 
 X = df.drop('Churn', axis=1) 
 y = df['Churn'] # em x e y separamos variáveis preditoras e alvo
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # dados em 70 porcento e 30 porcento 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y) # dados em 70 porcento e 30 porcento
+
+
+
+##################### ETAPA METODOLOGIA 3.2 : TREINAR MODELOS QUE SERÃO USADOS #############################
+
+
+models = {
+    "Regressão Logística": LogisticRegression(max_iter=1000),
+    "Árvore de Decisão": DecisionTreeClassifier(random_state=42),
+    "Random Forest": RandomForestClassifier(random_state=42),
+    "XGBoost": XGBClassifier(eval_metric='logloss', random_state=42, base_score=0.5, use_label_encoder=False)
+}
+
+results = {}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    results[name] = {
+        "Acurácia": accuracy_score(y_test, y_pred),
+        "Precisão": precision_score(y_test, y_pred),
+        "Recall": recall_score(y_test, y_pred),
+        "F1": f1_score(y_test, y_pred),
+        "AUC": roc_auc_score(y_test, y_pred)}
+
+results_df = pd.DataFrame(results).T
+print(results_df)
+
+
+
+
+
+##################### ETAPA METODOLOGIA 3.4 : EXPLICABILIDADE #############################
+## Eu estava tendo muita dificuldade nessa parte porque estava dando muitos erros, então precisei da ajuda do chatgpt para conseguir corrigir,
+# o problema era incompatibilidade entre shap, xgboost e scikit-learn, o chatgpt mandou eu dar o comando
+# pip install --upgrade --force-reinstall shap xgboost scikit-learn pandas para atualizar as bibliotecas no meu pc, e reformulou o código da 
+# seguinte forma>>>
+
+
+# --- INÍCIO DA SOLUÇÃO "NOVA API EXPLÍCITA" (PLANO E) ---
+
+# 1. Obtenha o modelo XGBoost treinado
+model_xgb = models["XGBoost"]
+
+# 2. Crie um "masker" explícito para os dados
+#    Isso diz ao SHAP como lidar com o DataFrame do X_train
+masker = shap.maskers.Independent(X_train)
+
+# 3. Use a nova interface 'shap.Explainer'
+#    Passando o modelo e o masker separadamente
+print("Inicializando shap.Explainer (com masker explícito)...")
+explainer = shap.Explainer(model_xgb.predict_proba, masker)
+
+# --- FIM DA SOLUÇÃO "NOVA API EXPLÍCITA" ---
+
+print("Calculando SHAP values (pode demorar um pouco)...")
+# Nota: Isso agora usará o KernelExplainer, então será lento.
+# Mas deve funcionar, pois estamos passando a função .predict_proba
+shap_explanation_values = explainer(X_test).values
+
+# O resultado será uma lista [valores_classe_0, valores_classe_1]
+# Vamos pegar apenas os da classe 1 (Churn)
+shap_values_class_1 = shap_explanation_values[:,:,1]
+
+print("Cálculo concluído.")
+
+# NOTA: A plotagem precisa ser ajustada
+print("Plotando gráficos SHAP...")
+shap.summary_plot(shap_values_class_1, X_test, plot_type="bar", show=True)
+shap.summary_plot(shap_values_class_1, X_test, show=True)
+
+shap.initjs()
+i = 10
+
+# O force_plot precisa ser reconstruído, pois a nova API é diferente
+# Precisamos do 'base_value' da classe 1
+base_value_class_1 = explainer.expected_value[1]
+force_plot = shap.force_plot(base_value_class_1, shap_values_class_1[i,:], X_test.iloc[i,:])
+shap.save_html("force_plot_tree_new_api.html", force_plot) # Salva como HTML
+print(f"Gráfico force_plot (Tree) salvo como 'force_plot_tree_new_api.html'")
