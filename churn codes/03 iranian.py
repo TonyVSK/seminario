@@ -13,18 +13,16 @@ import shap
 
 
 # Banco de dados arquivo CSV com dados:
-df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
+df = pd.read_csv("03 iranian churn dataset.csv")
 
 # testar upload do banco:
 print(df.head())
 
 
 
-##################### ETAPA METODOLOGIA 3.1 : TRATAR PRE-PROCESSAMENTO #############################
+# ##################### ETAPA METODOLOGIA 3.1 : TRATAR PRE-PROCESSAMENTO #############################
 
 
-df = df.drop(['customerID'], axis=1) # com isso removemos as colunas irrelevantes, como customerID
-df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
 df = df.dropna() # Com isso normalizamos para numerico para não dar problema
 label_encoders = {}  # Codificar variáveis categóricas
 for column in df.select_dtypes(include=['object']).columns:
@@ -38,7 +36,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 
 
-##################### ETAPA METODOLOGIA 3.2 : TREINAR MODELOS QUE SERÃO USADOS #############################
+# ##################### ETAPA METODOLOGIA 3.2 : TREINAR MODELOS QUE SERÃO USADOS #############################
 
 
 models = {
@@ -67,12 +65,44 @@ print(results_df)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##################### ETAPA METODOLOGIA 3.4 : EXPLICABILIDADE #############################
 ## 
 # NOVA API EXPLÍCITA - PRECISEI APLICAR UMA SOLUÇÃO DIFERENTE PARA CONSEGUIR EXECUTAR O CÓDIGO
 
 # Modelo XGBoost treinado
-model_xgb = models["XGBoost"]
+model_xgb = models["Random Forest"]
 
 # Masker explicito para dados, assim o SHAP vai saber lidar com dataframe x_train
 masker = shap.maskers.Independent(X_train)
