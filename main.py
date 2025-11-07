@@ -8,6 +8,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 import shap
+# ITS NECESSARY TO HAVE matplotlib TO RUN THE SHAP AND SEE THE GRAPHICS!!!
+
+
 
 # Banco de dados arquivo CSV com dados:
 df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
@@ -65,31 +68,27 @@ print(results_df)
 
 
 ##################### ETAPA METODOLOGIA 3.4 : EXPLICABILIDADE #############################
-## Eu estava tendo muita dificuldade nessa parte porque estava dando muitos erros, então precisei da ajuda do chatgpt para conseguir corrigir,
-# o problema era incompatibilidade entre shap, xgboost e scikit-learn, o chatgpt mandou eu dar o comando
-# pip install --upgrade --force-reinstall shap xgboost scikit-learn pandas para atualizar as bibliotecas no meu pc, e reformulou o código da 
-# seguinte forma>>>
+## 
+# NOVA API EXPLÍCITA - PRECISEI APLICAR UMA SOLUÇÃO DIFERENTE PARA CONSEGUIR EXECUTAR O CÓDIGO
 
-
-# --- INÍCIO DA SOLUÇÃO "NOVA API EXPLÍCITA" (PLANO E) ---
-
-# 1. Obtenha o modelo XGBoost treinado
+# Modelo XGBoost treinado
 model_xgb = models["XGBoost"]
 
-# 2. Crie um "masker" explícito para os dados
-#    Isso diz ao SHAP como lidar com o DataFrame do X_train
+# Masker explicito para dados, assim o SHAP vai saber lidar com dataframe x_train
 masker = shap.maskers.Independent(X_train)
-
-# 3. Use a nova interface 'shap.Explainer'
-#    Passando o modelo e o masker separadamente
-print("Inicializando shap.Explainer (com masker explícito)...")
+print("INICIANDO... ")
 explainer = shap.Explainer(model_xgb.predict_proba, masker)
 
-# --- FIM DA SOLUÇÃO "NOVA API EXPLÍCITA" ---
+####
+####
+####
+# FIM API EXPLICITA
+####
+####
+####
 
 print("Calculando SHAP values (pode demorar um pouco)...")
-# Nota: Isso agora usará o KernelExplainer, então será lento.
-# Mas deve funcionar, pois estamos passando a função .predict_proba
+# KernelExplainer => lento
 shap_explanation_values = explainer(X_test).values
 
 # O resultado será uma lista [valores_classe_0, valores_classe_1]
