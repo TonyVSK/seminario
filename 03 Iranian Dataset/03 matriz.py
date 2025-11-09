@@ -30,6 +30,6 @@ print(corr_target)
 # matriz correlação
 plt.figure(figsize=(12,10))
 sns.heatmap(corr, cmap='coolwarm', annot=True, fmt=".2f")
-plt.title('Matriz correlação')
+plt.title('correlation matrix')
 plt.tight_layout()
 plt.show()
