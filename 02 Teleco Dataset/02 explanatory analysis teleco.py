@@ -42,23 +42,3 @@ sns.boxplot(x='Churn', y='Total day minutes', data=df)
 plt.title('Total day minutes x Churn')
 plt.show()
 
-# # Complains
-# sns.countplot(x='Complains', hue='Churn', data=df, palette='pastel')
-# plt.title('Churn and Complains')
-# plt.xlabel('Is there any complains? (0 = No, 1 = Yes)')
-# plt.ylabel('Number of Costumers')
-# plt.legend(title='Churn', labels=['No', 'Yes'])
-# plt.tight_layout()
-# plt.savefig('bar_senior_churn.png')
-# plt.show()
-
-
-# # Status
-# sns.countplot(x='Status', hue='Churn', data=df, palette='pastel')
-# plt.title('Churn and Status')
-# plt.xlabel('Did the customer cancel the service? (1 = No, 2 = Yes)')
-# plt.ylabel('Number of Costumers')
-# plt.legend(title='Churn', labels=['No', 'Yes'])
-# plt.tight_layout()
-# plt.savefig('bar_senior_churn.png')
-# plt.show()
